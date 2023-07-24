@@ -1,0 +1,54 @@
+body {
+  background-color: rgb(245, 160, 241);
+}
+
+input {
+  text-align: center;
+}
+
+.search-form {
+  margin-top: 20px;
+  padding: 5px;
+  text-align: center;
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+#gallery {
+  margin-bottom: 50px;
+}
+
+.photo-card {
+  float: left;
+  width: 33.333333%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.gallery-image img {
+  display: block;
+  max-width: 100%;
+  height: 50%;
+  border: 5px solid #eee;
+  box-sizing: border-box;
+}
+
+.info {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #1f1d1d;
+  text-align: start;
+  margin: 20px 0;
+}
+
+.load-more {
+  margin-bottom: 30px;
+  margin-left: 50%;
+  margin-right: 50%;
+}

@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Page title</title>
+  <link rel="stylesheet" type="text/css" href="main.css">
   <link rel="stylesheet" href="./sass/index.scss" />
   <script type="module" src="./index.js"></script>
 </head>
@@ -12,13 +13,14 @@
 <body>
 
   <form class="search-form" id="search-form">
-    <input type="text" name="searchQuery" autocomplete="off" placeholder="Search images..." />
-    <button type="submit">Search</button>
+    <input type="text" class="js-text" name="searchQuery" autocomplete="off" placeholder="Search images..." />
+    <button type="submit" class="js-search-button">Search</button>
   </form>
+  <div class="gallery">
+    <!-- Картки зображень -->
+  </div>
+  <button type="button" class="load-more hidden" hidden>Load more</button>
 
-
-  <!-- ❗️❗️❗️ Add partials like so for every page -->
-  <include src="./partials/example.html"></include>
 </body>
 
 </html>
