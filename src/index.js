@@ -20,10 +20,10 @@ let page = 1;
 refs.searchForm.addEventListener('submit', onSubmit);
 refs.loadMore.addEventListener('click', onLoadMore);
 
-function onLoadMore() {
+async function onLoadMore() {
   page += 1;
 
-  fetchImages(page).then(data => {
+  await fetchImages(page).then(data => {
     refs.gallery.insertAdjacentHTML('beforeend', createImagesMarkup(data.hits));
     lightbox.refresh();
     if (page >= Number(data.totalHits / 40)) {
@@ -33,6 +33,10 @@ function onLoadMore() {
       );
     }
   });
+  pageScroll();
+}
+
+function pageScroll() {
   const { height: cardHeight } = document
     .querySelector('.gallery')
     .firstElementChild.getBoundingClientRect();
@@ -43,78 +47,68 @@ function onLoadMore() {
   });
 }
 
-function onSubmit(evt) {
+async function onSubmit(evt) {
   evt.preventDefault();
-
-  page += 1;
-
-  fetchImages()
-    .then(data => {
-      console.log(data);
-      refs.gallery.insertAdjacentHTML(
-        'beforeend',
-        createImagesMarkup(data.hits)
-      );
-      lightbox.refresh();
-      Notiflix.Notify.info(`Hooray! We found ${data.totalHits} images.`);
-      if (page < Number(data.totalHits / 40)) {
-        refs.loadMore.hidden = false;
-      }
-    })
-    .catch(err => console.log(err.message));
-}
-
-function fetchImages(page = 1) {
-  const BASE_URL = 'https://pixabay.com/api/';
-  const API_KEY = '38407139-ecc8ce3f4d9849c22fd8a553c';
-
-  return fetch(
-    `${BASE_URL}?key=${API_KEY}&page=${page}&per_page=40&q=${refs.input.value}&image_type=photo&orientation=horizontal&safesearch=true`
-  ).then(resp => {
-    if (!resp.ok) {
-      throw new Error(resp.statusText);
-    }
-    console.log(resp);
-    return resp.json();
-  });
-}
-// axios
-//   .get(`${BASE_URL}`, {
-//     params: {
-//       key: `${API_KEY}`,
-//       q: `${refs.input.value}`,
-//       page: `${page}`,
-//       per_page: '40',
-//       image_type: 'photo',
-//       orientation: 'horizontal',
-//       safesearch: 'true',
-//     },
-//   })
-//   .then(resp => {
-//   if (!resp.ok) {
-//     throw new Error(resp.statusText);
-//   }
-//   console.log(resp);
-//   return resp.json();
-// });
-
-function createImagesMarkup(hits) {
-  if (hits.length <= 0) {
-    Notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
+  const inputContent = refs.input.value;
+  if (inputContent === '') {
+    return;
   }
-  return hits
-    .map(
-      ({
-        webformatURL,
-        largeImageURL,
-        tags,
-        likes,
-        views,
-        comments,
-        downloads,
-      }) => `<div class="photo-card">
+
+  page = 1;
+
+  try {
+    await fetchImages(page);
+    refs.gallery.insertAdjacentHTML('beforeend', createImagesMarkup(data.hits));
+    lightbox.refresh();
+
+    if (page < Number(data.totalHits / 40)) {
+      refs.loadMore.hidden = false;
+      Notiflix.Notify.info(`Hooray! We found ${data.totalHits} images.`);
+    }
+  } catch {
+    err => console.log(err);
+  }
+
+  async function fetchImages(page = 1) {
+    const BASE_URL = 'https://pixabay.com/api/';
+    const API_KEY = '38407139-ecc8ce3f4d9849c22fd8a553c';
+    const inputContent = refs.input.value;
+
+    await axios
+      .get(`${BASE_URL}`, {
+        params: {
+          key: `${API_KEY}`,
+          q: `${inputContent}`,
+          page: `${page}`,
+          per_page: '40',
+          image_type: 'photo',
+          orientation: 'horizontal',
+          safesearch: 'true',
+        },
+      })
+
+      .then(resp => {
+        return resp.data;
+      });
+  }
+
+  function createImagesMarkup(hits) {
+    if (hits.length <= 0) {
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    }
+    return hits
+      .map(
+        ({
+          webformatURL,
+          largeImageURL,
+          tags,
+          likes,
+          views,
+          comments,
+          downloads,
+        }) => `<div class="photo-card">
          <a class="gallery-image" href="${largeImageURL}">
             <img src="${webformatURL}" alt="${tags}" class="image "loading="lazy" width="300"/>
          </a>
@@ -133,6 +127,7 @@ function createImagesMarkup(hits) {
           </p>
         </div>
         </div>`
-    )
-    .join('');
+      )
+      .join('');
+  }
 }
