@@ -57,13 +57,13 @@ async function onSubmit(evt) {
   page = 1;
 
   try {
-    await fetchImages(page);
-    refs.gallery.insertAdjacentHTML('beforeend', createImagesMarkup(data.hits));
+    const { hits, totalHits } = await fetchImages(page);
+    refs.gallery.insertAdjacentHTML('beforeend', createImagesMarkup(hits));
     lightbox.refresh();
 
-    if (page < Number(data.totalHits / 40)) {
+    if (page < Number(totalHits / 40)) {
       refs.loadMore.hidden = false;
-      Notiflix.Notify.info(`Hooray! We found ${data.totalHits} images.`);
+      Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
     }
   } catch {
     err => console.log(err);
@@ -74,22 +74,18 @@ async function onSubmit(evt) {
     const API_KEY = '38407139-ecc8ce3f4d9849c22fd8a553c';
     const inputContent = refs.input.value;
 
-    await axios
-      .get(`${BASE_URL}`, {
-        params: {
-          key: `${API_KEY}`,
-          q: `${inputContent}`,
-          page: `${page}`,
-          per_page: '40',
-          image_type: 'photo',
-          orientation: 'horizontal',
-          safesearch: 'true',
-        },
-      })
-
-      .then(resp => {
-        return resp.data;
-      });
+    const { data } = await axios.get(`${BASE_URL}`, {
+      params: {
+        key: `${API_KEY}`,
+        q: `${inputContent}`,
+        page: `${page}`,
+        per_page: '40',
+        image_type: 'photo',
+        orientation: 'horizontal',
+        safesearch: 'true',
+      },
+    });
+    return data;
   }
 
   function createImagesMarkup(hits) {
