@@ -23,10 +23,10 @@ refs.loadMore.addEventListener('click', onLoadMore);
 async function onLoadMore() {
   page += 1;
 
-  await fetchImages(page).then(data => {
-    refs.gallery.insertAdjacentHTML('beforeend', createImagesMarkup(data.hits));
+  await fetchImages(page).then(({ hits, totalHits }) => {
+    refs.gallery.insertAdjacentHTML('beforeend', createImagesMarkup(hits));
     lightbox.refresh();
-    if (page >= Number(data.totalHits / 40)) {
+    if (page >= Number(totalHits / 40)) {
       refs.loadMore.hidden = true;
       Notiflix.Notify.failure(
         "We're sorry, but you've reached the end of search results."
